@@ -13,40 +13,46 @@ class TelegramUser(Base):
     debank_key = Column(Text)
     registration_date = Column(Date(), default=datetime.now)
 
+    def __init__(self, id=None, first_name="", last_name="", binance_key="", debank_key="", session=None):
+        self.session = session or Session()
+        self.id = id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.binance_key = binance_key
+        self.debank_key = debank_key
+        # self.registration_date = datetime.now
+
+
     def __repr__(self):
         return f"{self.first_name}, {self.last_name}, registered on {self.registration_date}"
 
     def __str__(self):
         return repr(self)
 
-    @staticmethod
-    def find_or_register_new_user(id, first_name, last_name, binance_key):
-        user = TelegramUser.get_user(id)
+    def find_or_register_new_user(self, id, first_name, last_name, binance_key):
+        user = self.get_user(id)
         if user != None:
             return user
         else:
-            return TelegramUser.register_new_user(id, first_name, last_name, binance_key)
+            return self.register_new_user(id, first_name, last_name, binance_key)
 
-    @staticmethod
-    def register_new_user(id, first_name, last_name, binance_key):
+    def register_new_user(self, id, first_name, last_name, binance_key):
         my_user = TelegramUser(
             id=id,
             first_name=first_name,
             last_name=last_name,
             binance_key=binance_key,
-            registration_date=datetime.now()
         )
 
-        session = Session()  # Create new session
-        session.add(my_user)  # Add user to the session
-        session.commit()  # Save changes to the database
-        session.close()
+        self.session.add(my_user)  # Add user to the session
+        self.session.commit()  # Save changes to the database
+        # self.session.close()
 
         return my_user
 
-    @staticmethod
-    def get_user(id):
-        session = Session()
-        return None if session.query(TelegramUser).count() == 0 else session.query(TelegramUser).filter(TelegramUser.id == id).one()
+    def get_user(self, id):
+        return None if self.session.query(TelegramUser).count() == 0 else self.session.query(TelegramUser).filter(
+            TelegramUser.id == id).one()
+
 
 Base.metadata.create_all()
