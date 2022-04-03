@@ -2,8 +2,7 @@ import telebot
 
 from DB.database import Session
 from constants import TEl_BOT_KEY
-from DB.TelegramUser import TelegramUser
-
+from DB.TelegramUserService import TelegramUserService
 
 bot = telebot.TeleBot(TEl_BOT_KEY)
 
@@ -21,14 +20,13 @@ To register, please use the /register command
 @bot.message_handler(commands=['register'])
 def register_new_user(message):
     session = Session()
-    user = TelegramUser(session = session).find_or_register_new_user(id=message.from_user.id,
-                                                  first_name=message.from_user.first_name,
-                                                  last_name=message.from_user.last_name,
-                                                  binance_key=message.text.replace("/register", "").strip()
-                                                  )
-    print(user.first_name)
+    user = TelegramUserService(session).find_or_register_new_user(telegram_id=message.from_user.id,
+                                     first_name=message.from_user.first_name,
+                                     last_name=message.from_user.last_name,
+                                     binance_key=message.text.replace("/register", "").strip()
+                                     )
+    # print(user.first_name)
     session.close()
-
 
 # print(message.text)
 # print(message.from_user.id)
