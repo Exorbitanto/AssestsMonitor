@@ -1,6 +1,7 @@
 from DB.database import Session
 from DB.TelegramUser import TelegramUser
 from DB.Binance.Biance_API import try_api_key
+from DB.SpotDataService import SpotDataService
 
 class TelegramUserService:
 
@@ -12,15 +13,16 @@ class TelegramUserService:
         if user != None:
             return "already_exists"
         else:
-            try_keys = try_api_key(binance_key, binance_secret_key)
-            if try_keys[0]["status"] == 200:
+            try_keys_result = try_api_key(binance_key, binance_secret_key)
+            if try_keys_result[0]["status"] == 200:
                 try:
                     self.register_new_user(telegram_id, first_name, last_name, binance_key, binance_secret_key)
+                    SpotDataService.process_and_register_spot_data(try_keys_result)
                     return "user_registered_successfully"
                 except Exception as ex:
                     return f"error {ex}"
             else:
-                return try_keys[1]["error_text"]
+                return try_keys_result[1]["error_text"]
 
     def register_new_user(self, telegram_id, first_name, last_name, binance_key="", binance_secret_key = "", debank_wallet=""):
         my_user = TelegramUser(
@@ -51,6 +53,7 @@ class TelegramUserService:
         else:
             self.register_new_user(telegram_id, first_name, last_name, debank_wallet = debank_wallet)
             return "user_registered_successfully"
+
 
 
 

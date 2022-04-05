@@ -1,13 +1,30 @@
+from datetime import datetime
+
 from DB.database import Session
 from DB.SpotData import SpotData
 
 
 class SpotDataService:
 
-    def __init__(self, session=None):
-        self.session = session or Session()
+    @staticmethod
+    def process_and_register_spot_data(binance_spot_data):
+        if binance_spot_data[0]["status"] == 200:
+            data_load =  binance_spot_data[1]["data_load"]
+            for element in data_load["snapshotVos"]:
+                date = datetime.utcfromtimestamp(element["updateTime"] / 1000)
+                session = Session()
+                for currency in element["data"]["balances"]:
+                    currency_symbol = currency["asset"]  # currency name
+                    available_amount = currency["free"]  # avaialble amount
+                    locked_amount = currency["locked"] #locked amount
+                    SpotDataService.register_new_data(session, date, currency_symbol, available_amount, locked_amount)
+                session.commit()  # Save changes to the database
+                session.close()
 
-    def register_new_data(self, date, currency_symbol, available_amount, locked_amount):
+
+    @staticmethod
+    def register_new_data(session, date, currency_symbol, available_amount, locked_amount):
+
         my_data = SpotData(
             date=date,
             currency_symbol=currency_symbol,
@@ -15,15 +32,22 @@ class SpotDataService:
             locked_amount=locked_amount
         )
 
-        self.session.add(my_data)  # Add data to the session
-        self.session.commit()  # Save changes to the database
+        session.add(my_data)  # Add data to the session
 
-        return my_data
 
-    def get_data(self, telegram_id):
-        pass
-        # return None if self.session.query(TelegramUser).count() == 0 else self.session.query(TelegramUser).filter(
-        #     TelegramUser.telegram_id == telegram_id).one()
 
+# info["snapshotVos"]  # list of dicts
+# for element in info["snapshotVos"]:
+#     ts = element["updateTime"] / 1000
+#     print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))  # timestamp
+#     element["data"]  # dict
+#     print(element["data"]["totalAssetOfBtc"])  # totla in BTC
+#     element["data"]["balances"]  # list of dicts with assests
+#     for currency in element["data"]["balances"]:
+#         print(currency["asset"])  # currency name
+#         print(currency["free"])  # avaialble amount
+#         print(currency["locked"])  # locked amount
+#
+# print(info)
 
 
