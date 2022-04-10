@@ -47,9 +47,12 @@ class TelegramUserService:
         user = self.get_user(telegram_id)
 
         if user != None:
-            user.debank_wallet = debank_wallet
-            self.session.commit()  # Save changes to the database
-            return "debank_wallet_registered_successfully"
+            if user.debank_wallet == "":
+                user.debank_wallet = debank_wallet
+                self.session.commit()  # Save changes to the database
+                return "debank_wallet_registered_successfully"
+            else:
+                return "debank_wallet_already_exists"
         else:
             self.register_new_user(telegram_id, first_name, last_name, debank_wallet = debank_wallet)
             return "user_registered_successfully"

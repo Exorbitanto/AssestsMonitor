@@ -44,16 +44,16 @@ def add_debank_wallet(message):
     if debank_wallet == "":
         bot.reply_to(message,
                      "Hi there, I am Crypto Assets Monitor.To register, please use the /add_debank_wallet command followed by your debank wallet ID")
-
-    session = Session()
-    register_debank_wallet_result = TelegramUserService(session).add_debank_wallet(
-        telegram_id=message.from_user.id,
-        first_name=message.from_user.first_name,
-        last_name=message.from_user.last_name,
-        debank_wallet=debank_wallet
-        )
-    session.close()
-    bot.reply_to(message, register_debank_wallet_result)
+    else:
+        session = Session()
+        register_debank_wallet_result = TelegramUserService(session).add_debank_wallet(
+            telegram_id=message.from_user.id,
+            first_name=message.from_user.first_name,
+            last_name=message.from_user.last_name,
+            debank_wallet=debank_wallet
+            )
+        session.close()
+        bot.reply_to(message, register_debank_wallet_result)
 
 
 bot.polling()

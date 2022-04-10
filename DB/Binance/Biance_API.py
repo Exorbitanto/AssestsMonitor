@@ -1,8 +1,4 @@
 from binance import Client
-from constants import BINANCE_SECRET_KEY, API_KEY
-from datetime import datetime
-
-
 
 
 def try_api_key(API_KEY, SECRET_KEY):
