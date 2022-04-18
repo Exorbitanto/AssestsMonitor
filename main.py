@@ -3,6 +3,7 @@ import telebot
 from DB.database import Session
 from constants import TEl_BOT_KEY
 from DB.TelegramUserService import TelegramUserService
+from DB.SpotDataService import SpotDataService
 
 bot = telebot.TeleBot(TEl_BOT_KEY)
 
@@ -54,6 +55,15 @@ def add_debank_wallet(message):
             )
         session.close()
         bot.reply_to(message, register_debank_wallet_result)
+
+# Handle '/assets'
+@bot.message_handler(commands=['assets'])
+def register_new_user(message):
+    session = Session()
+    result = SpotDataService(session).get_and_compare_assets_for_last_2_days(message.from_user.id)
+    session.close()
+
+    bot.reply_to(message, result)
 
 
 bot.polling()

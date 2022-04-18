@@ -2,7 +2,6 @@ from DB.database import Base
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Date, Text
 
-
 class TelegramUser(Base):
     __tablename__ = 'telegram_users'
 
@@ -27,6 +26,5 @@ class TelegramUser(Base):
 
     def __str__(self):
         return repr(self)
-
 
 Base.metadata.create_all()
